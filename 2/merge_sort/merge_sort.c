@@ -70,7 +70,21 @@ void print(int *a, int na)
  */
 void merge(int *a, int *b, int *c, int na, int nb)
 {
-	/* Реализовать процедуру слияния. */
+	int i = 0, j = 0;
+	while (i < na && j < nb) {
+		if (a[i] <= b[j]) {
+			c[i + j] = a[i];
+			i++;
+		} else {
+			c[i + j] = b[j];
+			j++;
+		}
+	}
+	if (i < na) {
+		memcpy(c + i + j, a + i, (na - i) * sizeof(int));
+	} else {
+		memcpy(c + i + j, b + j, (nb - j) * sizeof(int));
+	}
 }
 
 /*
@@ -78,5 +92,19 @@ void merge(int *a, int *b, int *c, int na, int nb)
  */
 void merge_sort(int *a, int na)
 {
-	/* Реализовать процедуру сортировки, используя процедуру слияния. */
+	if(na < 2) return;
+	if(na == 2) {
+		if(a[0] > a[1]) { int t = a[0]; a[0]=a[1]; a[1]=t; }
+		return;
+	}
+	merge_sort(a, na / 2);
+	merge_sort(a + na / 2, na - na / 2);
+
+	int *b = (int*)malloc(sizeof(int) * na);
+	
+	merge(a, a + na / 2, b, na / 2, na - na / 2);
+	
+	memcpy(a, b, sizeof(int) * na);
+	
+	free(b);
 }
