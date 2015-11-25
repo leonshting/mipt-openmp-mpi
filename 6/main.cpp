@@ -43,6 +43,7 @@ int main() {
     answer = vector<double>(matrix->num_strings, 0.0);
     answer_oc = vector<bool>(matrix->num_strings, false);
     reduction(matrix, f, 0);
+    print_vector_d(answer);
     return 0;
 }
 
