@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include <mpi.h>
+#include "mpi.h"
 
 
 #define BSM 5
@@ -42,10 +42,45 @@ int ind(int i, int j, life_t *l)
     return (((i + l->nx) % l->nx) + ((j + l->ny) % l->ny) * (l->nx));
 }
 
+int ind2(int i, int j, life_t_reduced *l)
+{
+    return (((i + l->nx) % l->nx) + ((j + l->ny) % l->ny) * (l->nx));
+}
+
 void life_init(const char *path, life_t *l);
 void life_free(life_t *l);
 void life_step(life_t *l);
 void life_save_vtk(const char *path, life_t *l);
+void life_save_vtk2(const char *path, int * storage, life_t_reduced * lives, int numlives, int * blocklens, int * blockstrides, life_t * l)
+{
+    FILE *f;
+    int i, i1, i2, j;
+    f = fopen(path, "w");
+    assert(f);
+    fprintf(f, "# vtk DataFile Version 3.0\n");
+    fprintf(f, "Created by write_to_vtk2d\n");
+    fprintf(f, "ASSII\n");
+    fprintf(f, "DATASET STRUCTURED_POINTS\n");
+    fprintf(f, "DIMENSIONS %d %d 1\n", l->nx+1, l->ny+1);
+    fprintf(f, "SPACING %d %d 0.0\n", 1, 1);
+    fprintf(f, "ORIGIN %d %d 0.0\n", 0, 0);
+    fprintf(f, "CELL_DATA %d\n", l->nx * l->ny);
+
+    fprintf(f, "SCALARS life int 1\n");
+    fprintf(f, "LOOKUP_TABLE life_table\n");
+    for(i = 0; i < numlives ; i++) {
+        for (j = 0; j < (lives[i].nx-2) * (lives[i].ny-2); j++) {
+            l->u0[ind(lives[i].beg_x+1 + j % (lives[i].nx-2), lives[i].beg_y+1 + j / (lives[i].nx-2), l)] =
+                    storage[blockstrides[i] + ind2(lives[i].beg_x + 1 + j % (lives[i].nx-2), lives[i].beg_y + 1 + j / (lives[i].nx-2),&lives[i])];
+        }
+    }
+    for (i2 = 0; i2 < l->ny; i2++) {
+        for (i1 = 0; i1 < l->nx; i1++) {
+            if(l->u0[ind(i1, i2, l)] == 1) fprintf(f, "%d\t%d\t%d\n", i1, i2, l->u0[ind(i1, i2, l)]);
+        }
+    }
+    fclose(f);
+}
 void make_part(life_t *old, life_t *new, int coords[], int proc_sizes[]);
 void part_of_life(life_t *old, life_t *new, int beg[]);
 void make_reduced_copy_of_life(life_t *some, life_t_reduced * some2);
@@ -153,6 +188,10 @@ int main(int argc, char **argv)
 	life_t l;
     life_t_reduced reduced;
     life_t some;
+    life_t_reduced dimreduced[numprocs];
+    int *blocklens_forroot;
+    int *strides_forroot;
+    int sumsize = 0;
     if(myid == 0) {
         life_init(argv[1], &l);
     }
@@ -162,6 +201,8 @@ int main(int argc, char **argv)
     if(myid == 0)
     {
         int i;
+        blocklens_forroot = calloc(numprocs, sizeof(int));
+        strides_forroot = calloc(numprocs, sizeof(int));
         for(i = 0; i < numprocs; i++)
         {
             life_t *tmp; life_t_reduced to_send;
@@ -170,6 +211,11 @@ int main(int argc, char **argv)
             MPI_Cart_coords(new_comm, i, 2, coords);
             make_part(&l, tmp, coords, dim_size);
             make_reduced_copy_of_life(tmp, &to_send);
+            strides_forroot[i] = ((i-1)<0)?0:(strides_forroot[i-1] + tmp->nx * tmp->ny);
+            blocklens_forroot[i] = tmp->nx * tmp->ny;
+            sumsize += blocklens_forroot[i];
+            printf("%d %d\n", strides_forroot[i], blocklens_forroot[i]);
+            dimreduced[i] = to_send;
             if(i!=0)
             {
                 MPI_Send(&to_send, 1, lifetype, i, 0, new_comm);
@@ -187,7 +233,6 @@ int main(int argc, char **argv)
         MPI_Recv(&reduced, 1, lifetype, 0, 0, new_comm, MPI_STATUS_IGNORE);
 
         init_life_from_reduced(&some, &reduced);
-        printf("%d %d\n", some.nx, some.ny);
         MPI_Recv(some.u0, some.ny * some.nx, MPI_INT, 0, 1, new_comm, MPI_STATUS_IGNORE);
     }
     MPI_Barrier(new_comm);
@@ -229,15 +274,18 @@ int main(int argc, char **argv)
 
     MPI_Request send[8];
     MPI_Request sendi[8];
+    int *storage = calloc(sumsize, sizeof(int));
 
 	char buf[100];
 	for (i = 0; i < some.steps; i++) {
         bsp = bs(&some); usp = us(&some); lsp = ls(&some); rsp = rs(&some);
         ulc = ul(&some); urc = ur(&some); brc = br(&some); blc = bl(&some);
         if (i % some.save_steps == 0) {
-            sprintf(buf, "life_%06d_pn%d.vtk", i, myid);
+
+            MPI_Gatherv(some.u0, some.nx*some.ny, MPI_INT, storage, blocklens_forroot, strides_forroot, MPI_INT, 0, new_comm);
+            sprintf(buf, "life_%06d.vtk", i);
             printf("Saving step %d to '%s'.\n", i, buf);
-            life_save_vtk(buf, &some);
+            if(myid == 0) life_save_vtk2(buf, storage, dimreduced, numprocs, blocklens_forroot, strides_forroot, &l);
         }
 
         MPI_Isend(bsp, some.nx-2, MPI_INT, bsr, BSM, new_comm, &send[BSM-5]);
@@ -268,6 +316,7 @@ int main(int argc, char **argv)
     free(lsp); free(lsp_r);
     free(usp); free(usp_r);
     free(rsp); free(rsp_r);
+    free(storage);
     MPI_Finalize();
 	return 0;
 }
@@ -300,12 +349,13 @@ void init_life_from_reduced(life_t *some, life_t_reduced * some2)
 void make_part(life_t *old, life_t *new, int coords[], int proc_sizes[])
 {
     int beg[2], end[2];
-    beg[0] = (int)(old->nx * (double)coords[0]/(double)proc_sizes[0])-1;
-    beg[1] = (int)(old->ny * (double)coords[1]/(double)proc_sizes[1])-1;
-    end[0] = (int)(old->nx * (double)(coords[0]+1)/(double)proc_sizes[0]);
-    end[1] = (int)(old->ny * (double)(coords[1]+1)/(double)proc_sizes[1]);
+    beg[0] = (int)(old->nx * coords[0])/proc_sizes[0]-1;
+    beg[1] = (int)(old->ny * coords[1])/proc_sizes[1]-1;
+    end[0] = (int)(old->nx * (coords[0]+1))/proc_sizes[0]+1;
+    end[1] = (int)(old->ny * (coords[1]+1))/proc_sizes[1]+1;
     new -> nx = end[0] - beg[0];
     new -> ny = end[1] - beg[1];
+    printf("%d %d\n", new->nx, new->ny);
     new->beg_x = beg[0];
     new->beg_y = beg[1];
     new -> save_steps = old -> save_steps;
