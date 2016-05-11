@@ -76,7 +76,7 @@ void life_save_vtk2(const char *path, int * storage, life_t_reduced * lives, int
     }
     for (i2 = 0; i2 < l->ny; i2++) {
         for (i1 = 0; i1 < l->nx; i1++) {
-            if(l->u0[ind(i1, i2, l)] == 1) fprintf(f, "%d\t%d\t%d\n", i1, i2, l->u0[ind(i1, i2, l)]);
+            /*if(l->u0[ind(i1, i2, l)] == 1)*/ fprintf(f, "%d\n",l->u0[ind(i1, i2, l)]);
         }
     }
     fclose(f);
@@ -97,7 +97,7 @@ int * ls(life_t * some)
 int * rs(life_t * some)
 {
     int * tmp = (int *) calloc(some->ny-2, sizeof(int));
-    int x = some->nx-1;
+    int x = some->nx-2;
     int i = 1;
     for(i = 1; i < some->ny-1; i++)
         tmp[i-1] = some->u0[ind(x,i, some)];
@@ -115,7 +115,7 @@ int * us(life_t * some)
 int * bs(life_t * some)
 {
     int * tmp = (int *) calloc(some->nx-2, sizeof(int));
-    int y = some->ny-1;
+    int y = some->ny-2;
     int i = 1;
     for(i = 1; i < some->nx-1; i++)
         tmp[i-1] = some->u0[ind(i,y,some)];
@@ -283,9 +283,12 @@ int main(int argc, char **argv)
         if (i % some.save_steps == 0) {
 
             MPI_Gatherv(some.u0, some.nx*some.ny, MPI_INT, storage, blocklens_forroot, strides_forroot, MPI_INT, 0, new_comm);
-            sprintf(buf, "life_%06d.vtk", i);
-            printf("Saving step %d to '%s'.\n", i, buf);
-            if(myid == 0) life_save_vtk2(buf, storage, dimreduced, numprocs, blocklens_forroot, strides_forroot, &l);
+            if(myid == 0)
+            {   
+                sprintf(buf, "life_%06d.vtk", i);
+               printf("Saving step %d to '%s'.\n", i, buf);
+               life_save_vtk2(buf, storage, dimreduced, numprocs, blocklens_forroot, strides_forroot, &l);
+            }
         }
 
         MPI_Isend(bsp, some.nx-2, MPI_INT, bsr, BSM, new_comm, &send[BSM-5]);
