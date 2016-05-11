@@ -54,6 +54,7 @@ int main(int argc, char **argv)
 		printf("Usage: %s input file.\n", argv[0]);
 		return 0;
 	}
+    omp_set_num_threads(16);
 	life_t l;
 	life_init(argv[1], &l);
     #pragma omp parallel
@@ -74,10 +75,10 @@ int main(int argc, char **argv)
             div_x *= factorized[i];
         else
             div_y *= factorized[i];
-        printf("%d\t", factorized[i]);
+     //   printf("%d\t", factorized[i]);
     }
-    printf("%d\n", div_x);
-    printf("%d\n", OMP_NUM_THREADS);
+    //printf("%d\n", div_x);
+    //printf("%d\n", OMP_NUM_THREADS);
     int x = 0;
     int y = 0;
     int rank = 0;
@@ -92,7 +93,7 @@ int main(int argc, char **argv)
             start_y[rank] = tmpy;
             start_x[rank] = tmpx;
             tmpy+=len_y[rank];
-            printf("%d %d %d\n", div_x,  start_x[rank], start_y[rank]);
+           // printf("%d %d %d\n", div_x,  start_x[rank], start_y[rank]);
             rank++;
 
         }
@@ -101,15 +102,19 @@ int main(int argc, char **argv)
 
 
 	char buf[100];
-	for (i = 0; i < l.steps; i++) {
-		if (i % l.save_steps == 0) {
+    #pragma omp parallel private (i)
+    {
+        int rank = omp_get_thread_num();
+        for (i = 0; i < l.steps; i++) {
+		/*if (i % l.save_steps == 0) {
 			sprintf(buf, "life_%06d.vtk", i);
 			printf("Saving step %d to '%s'.\n", i, buf);
 			life_save_vtk(buf, &l);
-		}
-		life_step(&l);
-	}
-	
+		}*/
+		    life_step(&l);
+	    }
+        #pragma omp barrier
+    }
 	life_free(&l);
 	return 0;
 }
@@ -129,9 +134,9 @@ void life_init(const char *path, life_t *l)
 	assert(fd);
 	assert(fscanf(fd, "%d\n", &l->steps));
 	assert(fscanf(fd, "%d\n", &l->save_steps));
-	printf("Steps %d, save every %d step.\n", l->steps, l->save_steps);
+//	printf("Steps %d, save every %d step.\n", l->steps, l->save_steps);
 	assert(fscanf(fd, "%d %d\n", &l->nx, &l->ny));
-	printf("Field size: %dx%d\n", l->nx, l->ny);
+//	printf("Field size: %dx%d\n", l->nx, l->ny);
 
 	l->u0 = (int*)calloc(l->nx * l->ny, sizeof(int));
 	l->u1 = (int*)calloc(l->nx * l->ny, sizeof(int));
@@ -142,7 +147,7 @@ void life_init(const char *path, life_t *l)
 		l->u0[ind(i, j)] = 1;
 		cnt++;
 	}
-	printf("Loaded %d life cells.\n", cnt);
+//	printf("Loaded %d life cells.\n", cnt);
 	fclose(fd);
 }
 
@@ -180,11 +185,9 @@ void life_save_vtk(const char *path, life_t *l)
 
 void life_step(life_t *l)
 {
-    #pragma omp parallel
-    {
         int i, j;
         int rank = omp_get_thread_num();
-        printf("%d\t", rank);
+    //    printf("%d\t", rank);
         fflush(stdout);
         for (j = start_y[rank]; j < start_y[rank] + len_y[rank]; j++) {
             for (i = start_x[rank]; i < start_x[rank] + len_x[rank]; i++) {
@@ -206,11 +209,11 @@ void life_step(life_t *l)
                 }
             }
         }
-    }
-	int *tmp;
+    #pragma omp master
+        {int *tmp;
 	tmp = l->u0;
 	l->u0 = l->u1;
-	l->u1 = tmp;
+	l->u1 = tmp;}
 }
 
 
