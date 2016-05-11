@@ -24,7 +24,8 @@ void life_save_vtk(const char *path, life_t *l);
 
 int main(int argc, char **argv)
 {
-	if (argc != 2) {
+    omp_set_num_threads(16);
+    if (argc != 2) {
 		printf("Usage: %s input file.\n", argv[0]);
 		return 0;
 	}
@@ -33,14 +34,17 @@ int main(int argc, char **argv)
 	
 	int i;
 	char buf[100];
-	for (i = 0; i < l.steps; i++) {
-		if (i % l.save_steps == 0) {
+    #pragma omp parallel private(i)
+    {
+    for (i = 0; i < l.steps; i++) {
+	/*	if (i % l.save_steps == 0) {
 			sprintf(buf, "life_%06d.vtk", i);
 			printf("Saving step %d to '%s'.\n", i, buf);
 			life_save_vtk(buf, &l);
-		}
+		}*/
 		life_step(&l);
-	}
+        #pragma omp barrier
+	}}
 	
 	life_free(&l);
 	return 0;
@@ -61,9 +65,9 @@ void life_init(const char *path, life_t *l)
 	assert(fd);
 	assert(fscanf(fd, "%d\n", &l->steps));
 	assert(fscanf(fd, "%d\n", &l->save_steps));
-	printf("Steps %d, save every %d step.\n", l->steps, l->save_steps);
+	//printf("Steps %d, save every %d step.\n", l->steps, l->save_steps);
 	assert(fscanf(fd, "%d %d\n", &l->nx, &l->ny));
-	printf("Field size: %dx%d\n", l->nx, l->ny);
+	//printf("Field size: %dx%d\n", l->nx, l->ny);
 
 	l->u0 = (int*)calloc(l->nx * l->ny, sizeof(int));
 	l->u1 = (int*)calloc(l->nx * l->ny, sizeof(int));
@@ -74,7 +78,7 @@ void life_init(const char *path, life_t *l)
 		l->u0[ind(i, j)] = 1;
 		cnt++;
 	}
-	printf("Loaded %d life cells.\n", cnt);
+	//printf("Loaded %d life cells.\n", cnt);
 	fclose(fd);
 }
 
@@ -113,7 +117,7 @@ void life_save_vtk(const char *path, life_t *l)
 void life_step(life_t *l)
 {
 	int i, j;
-    #pragma omp parallel for private(i,j)
+    #pragma omp for private(i,j)
 	for (j = 0; j < l->ny; j++) {
 		for (i = 0; i < l->nx; i++) {
 			int n = 0;
@@ -134,10 +138,11 @@ void life_step(life_t *l)
 			}
 		}
 	}
-	int *tmp;
+#pragma omp master
+    {	int *tmp;
 	tmp = l->u0;
 	l->u0 = l->u1;
-	l->u1 = tmp;
+	l->u1 = tmp;}
 }
 
 
