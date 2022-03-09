@@ -1,0 +1,746 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>783</width>
+    <height>550</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>1</horstretch>
+    <verstretch>1</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Life 3D</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>1</horstretch>
+     <verstretch>1</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="layoutMain" stretch="0,0">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMaximumSize</enum>
+      </property>
+      <item>
+       <widget class="LifeViewer" name="viewer" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>1</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="layoutControl">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinimumSize</enum>
+        </property>
+        <item>
+         <widget class="QPushButton" name="bLoad">
+          <property name="toolTip">
+           <string>Загрузить данные из файла...</string>
+          </property>
+          <property name="text">
+           <string>Load...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QPushButton" name="bNext">
+            <property name="toolTip">
+             <string>Следующий шаг</string>
+            </property>
+            <property name="text">
+             <string>Next</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="bPrev">
+            <property name="toolTip">
+             <string>Предыдущий шаг</string>
+            </property>
+            <property name="text">
+             <string>Previous</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QSpinBox" name="sbNum">
+            <property name="toolTip">
+             <string>Текущий шаг</string>
+            </property>
+            <property name="maximum">
+             <number>9000</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lSlash">
+            <property name="font">
+             <font>
+              <pointsize>18</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>/</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="sbMax">
+            <property name="toolTip">
+             <string>Максимальный номер шага</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="buttonSymbols">
+             <enum>QAbstractSpinBox::NoButtons</enum>
+            </property>
+            <property name="maximum">
+             <number>16777215</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetMinimumSize</enum>
+          </property>
+          <item>
+           <widget class="QPushButton" name="bPlay">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Начать проигрывание анимации</string>
+            </property>
+            <property name="text">
+             <string>Play</string>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="bStop">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Остановить проигрывание</string>
+            </property>
+            <property name="text">
+             <string>Stop</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetMinimumSize</enum>
+          </property>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Frame time:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="sbAnimDelay">
+            <property name="toolTip">
+             <string>Длительность одного кадра при анимации</string>
+            </property>
+            <property name="suffix">
+             <string>ms</string>
+            </property>
+            <property name="minimum">
+             <number>100</number>
+            </property>
+            <property name="maximum">
+             <number>20000</number>
+            </property>
+            <property name="singleStep">
+             <number>100</number>
+            </property>
+            <property name="value">
+             <number>1000</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QPushButton" name="bOpt">
+            <property name="toolTip">
+             <string>Установить камеру в наиболее оптимальную (по мнению программы) точку</string>
+            </property>
+            <property name="text">
+             <string>Best view</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbType">
+            <property name="toolTip">
+             <string>Тип отрисовки</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QCheckBox" name="cbFPS">
+            <property name="toolTip">
+             <string>Показывать FPS</string>
+            </property>
+            <property name="text">
+             <string>FPS</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbGrid">
+            <property name="toolTip">
+             <string>Показывать сетку в плоскости XY</string>
+            </property>
+            <property name="text">
+             <string>Grid</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbText">
+            <property name="toolTip">
+             <string>Показывать имя файла и номер шага</string>
+            </property>
+            <property name="text">
+             <string>Text</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QSpinBox" name="sbColorW">
+            <property name="toolTip">
+             <string>Выбрать тип клеток для установки цвета</string>
+            </property>
+            <property name="buttonSymbols">
+             <enum>QAbstractSpinBox::NoButtons</enum>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pColorC">
+            <property name="toolTip">
+             <string>Установить цвет для выбранного типа клеток</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_9">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbMovie">
+          <property name="toolTip">
+           <string>Последовательно сохранить в отдлеьные файлы все изображения шагов (камера фиксирована)</string>
+          </property>
+          <property name="text">
+           <string>Make 'movie'</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="bSaveImg">
+          <property name="toolTip">
+           <string>Сохраниьт текущую картинку в файл</string>
+          </property>
+          <property name="text">
+           <string>Save Image</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QPushButton" name="bSetSnapFormat">
+            <property name="toolTip">
+             <string>Выбрать формат файла для сохранения изображений</string>
+            </property>
+            <property name="text">
+             <string>File format</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>783</width>
+     <height>18</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>LifeViewer</class>
+   <extends>QWidget</extends>
+   <header>lifeviewer.h</header>
+   <container>1</container>
+   <slots>
+    <signal>frameChanged(int)</signal>
+    <signal>frameMaxChanged(int)</signal>
+    <slot>nextFrame()</slot>
+    <slot>prevFrame()</slot>
+    <slot>gotoFrame(int)</slot>
+    <slot>loadData()</slot>
+    <slot>setFPSIsDisplayed(bool)</slot>
+    <slot>setGridIsDrawn(bool)</slot>
+    <slot>setStereoDisplay(bool)</slot>
+    <slot>openSnapshotFormatDialog()</slot>
+    <slot>showEntireScene()</slot>
+    <slot>saveSnapshot()</slot>
+    <slot>startAnimation()</slot>
+    <slot>stopAnimation()</slot>
+    <slot>setAnimationPeriod(int)</slot>
+    <slot>setShowText(bool)</slot>
+    <slot>setDrawingMode(int)</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>bLoad</sender>
+   <signal>clicked()</signal>
+   <receiver>viewer</receiver>
+   <slot>loadData()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>749</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>578</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bNext</sender>
+   <signal>clicked()</signal>
+   <receiver>viewer</receiver>
+   <slot>nextFrame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>685</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>573</x>
+     <y>90</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bPrev</sender>
+   <signal>clicked()</signal>
+   <receiver>viewer</receiver>
+   <slot>prevFrame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>742</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>576</x>
+     <y>222</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbNum</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>viewer</receiver>
+   <slot>gotoFrame(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>631</x>
+     <y>155</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>569</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>viewer</sender>
+   <signal>frameChanged(int)</signal>
+   <receiver>sbNum</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>565</x>
+     <y>161</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>630</x>
+     <y>151</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>viewer</sender>
+   <signal>frameMaxChanged(int)</signal>
+   <receiver>sbMax</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>534</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>756</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bSetSnapFormat</sender>
+   <signal>clicked()</signal>
+   <receiver>viewer</receiver>
+   <slot>openSnapshotFormatDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>688</x>
+     <y>521</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>450</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bOpt</sender>
+   <signal>clicked()</signal>
+   <receiver>viewer</receiver>
+   <slot>showEntireScene()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>681</x>
+     <y>335</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>318</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bSaveImg</sender>
+   <signal>clicked()</signal>
+   <receiver>viewer</receiver>
+   <slot>saveSnapshot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>656</x>
+     <y>483</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>418</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbFPS</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>viewer</receiver>
+   <slot>setFPSIsDisplayed(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>654</x>
+     <y>349</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>380</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbGrid</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>viewer</receiver>
+   <slot>setGridIsDrawn(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>708</x>
+     <y>346</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbMovie</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>makeMovie()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>756</x>
+     <y>452</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>722</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bPlay</sender>
+   <signal>clicked()</signal>
+   <receiver>viewer</receiver>
+   <slot>startAnimation()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>645</x>
+     <y>215</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bStop</sender>
+   <signal>clicked()</signal>
+   <receiver>viewer</receiver>
+   <slot>stopAnimation()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>735</x>
+     <y>213</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>284</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbAnimDelay</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>viewer</receiver>
+   <slot>setAnimationPeriod(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>775</x>
+     <y>256</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>298</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbText</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>viewer</receiver>
+   <slot>setShowText(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>743</x>
+     <y>357</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>363</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbType</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>viewer</receiver>
+   <slot>setDrawingMode(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>729</x>
+     <y>332</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>590</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbColorW</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>setColorWChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>685</x>
+     <y>380</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>676</x>
+     <y>413</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pColorC</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>setColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>747</x>
+     <y>387</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>745</x>
+     <y>398</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>makeMovie()</slot>
+  <slot>setColorClicked()</slot>
+  <slot>setColorWChanged(int)</slot>
+ </slots>
+</ui>
