@@ -1,0 +1,4 @@
+Для сборки потребуются Qt4 SDK (http://qt.nokia.com/downloads/), libQGLViewer (http://www.libqglviewer.com/download.html) и OpenGL.
+В Ubuntu: sudo apt-get install libqglviewer-qt4-dev libqglviewer-qt4-2 qt4-qmake libglu1-mesa-dev libglu1-mesa
+
+Сборка - в каталоге с исходниками: qmake av.pro && make
